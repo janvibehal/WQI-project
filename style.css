@@ -461,20 +461,20 @@ body {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(45deg, #2045ff,#76caff);
+    background-color: #18a6fe;
     color: white;
     border: none;
     font-size: 1.5rem;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 0px 20px rgba(13, 20, 49, 0.326);
     transition: all 0.3s ease;
     z-index: 100;
 }
 
 .info-btn:hover {
     transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 15px 35px rgba(38, 126, 240, 0.616);
 }
 
 /* Responsive Design */
