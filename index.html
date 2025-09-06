@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Quality Index Predictor</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>Water Quality Index Predictor</h1>
+                <p>Advanced ML-based water quality assessment system</p>
+            </div>
+            <div class="header-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalSamples">796</div>
+                    <div class="stat-label">Total Samples</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="modelAccuracy">97.3%</div>
+                    <div class="stat-label">Model Accuracy</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Input Panel -->
+            <div class="input-panel">
+                <h2>Water Quality Parameters</h2>
+                <form id="wqiForm" class="parameter-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="temp">Temperature (°C)</label>
+                            <input type="number" id="temp" name="temp" step="0.1" placeholder="e.g., 25.5">
+                            <span class="input-info">Typical range: 0-40°C</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="do">Dissolved Oxygen (mg/L)</label>
+                            <input type="number" id="do" name="do" step="0.01" placeholder="e.g., 8.5">
+                            <span class="input-info">Typical range: 0-15 mg/L</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ph">pH Level</label>
+                            <input type="number" id="ph" name="ph" step="0.01" min="0" max="14" placeholder="e.g., 7.2">
+                            <span class="input-info">Range: 0-14 (neutral: ~7)</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="bod">BOD (mg/L)</label>
+                            <input type="number" id="bod" name="bod" step="0.1" placeholder="e.g., 2.5">
+                            <span class="input-info">Bio-Chemical Oxygen Demand</span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nitrate">Nitrate (mg/L)</label>
+                            <input type="number" id="nitrate" name="nitrate" step="0.001" placeholder="e.g., 1.5">
+                            <span class="input-info">Nitrogen compounds</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="fc">Faecal Coliform (MPN/100mL)</label>
+                            <input type="number" id="fc" name="fc" step="0.1" placeholder="e.g., 50">
+                            <span class="input-info">Bacterial contamination</span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tc">Total Coliform (MPN/100mL)</label>
+                            <input type="number" id="tc" name="tc" step="0.1" placeholder="e.g., 100">
+                            <span class="input-info">Total bacterial count</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="conductivity">Conductivity (µmho/cm)</label>
+                            <input type="number" id="conductivity" name="conductivity" step="0.1" placeholder="e.g., 250">
+                            <span class="input-info">Electrical conductivity</span>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="predict-btn">
+                            <span class="btn-text">Predict WQI</span>
+                            <span class="btn-loader" style="display: none;">Processing...</span>
+                        </button>
+                        <button type="button" class="reset-btn" onclick="resetForm()">Reset</button>
+                        <button type="button" class="sample-btn" onclick="loadSampleData()">Load Sample</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="results-panel" id="resultsPanel" style="display: none;">
+                <h2>Prediction Results</h2>
+                
+                <!-- WQI Score Display -->
+                <div class="wqi-display">
+                    <div class="wqi-score">
+                        <div class="score-circle">
+                            <canvas id="wqiGauge" width="200" height="200"></canvas>
+                            <div class="score-value">
+                                <span id="wqiValue">--</span>
+                                <span class="score-unit">WQI</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="quality-info">
+                        <div class="quality-grade" id="qualityGrade">--</div>
+                        <div class="quality-description" id="qualityDescription">Enter parameters to get prediction</div>
+                        <div class="quality-recommendation" id="qualityRecommendation"></div>
+                    </div>
+                </div>
+
+                <!-- Parameter Analysis -->
+                <div class="parameter-analysis">
+                    <h3>Parameter Analysis</h3>
+                    <div class="parameters-grid" id="parametersGrid">
+                        <!-- Dynamic parameter cards will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-section">
+                    <div class="chart-container">
+                        <h3>Parameter Comparison</h3>
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Quality Distribution</h3>
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Info Modal -->
+        <div class="modal" id="infoModal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2>Water Quality Index Scale</h2>
+                <div class="wqi-scale">
+                    <div class="scale-item excellent">
+                        <div class="scale-color"></div>
+                        <div class="scale-info">
+                            <div class="scale-range">0-25</div>
+                            <div class="scale-grade">Grade A - Excellent</div>
+                            <div class="scale-desc">Super fit for consumption</div>
+                        </div>
+                    </div>
+                    <div class="scale-item good">
+                        <div class="scale-color"></div>
+                        <div class="scale-info">
+                            <div class="scale-range">25-50</div>
+                            <div class="scale-grade">Grade B - Good</div>
+                            <div class="scale-desc">Fit for consumption</div>
+                        </div>
+                    </div>
+                    <div class="scale-item poor">
+                        <div class="scale-color"></div>
+                        <div class="scale-info">
+                            <div class="scale-range">50-75</div>
+                            <div class="scale-grade">Grade C - Poor</div>
+                            <div class="scale-desc">OK for consumption but should be avoided</div>
+                        </div>
+                    </div>
+                    <div class="scale-item very-poor">
+                        <div class="scale-color"></div>
+                        <div class="scale-info">
+                            <div class="scale-range">75-100</div>
+                            <div class="scale-grade">Grade D - Very Poor</div>
+                            <div class="scale-desc">Not fit for consumption</div>
+                        </div>
+                    </div>
+                    <div class="scale-item unfit">
+                        <div class="scale-color"></div>
+                        <div class="scale-info">
+                            <div class="scale-range">>100</div>
+                            <div class="scale-grade">Grade E - Unfit</div>
+                            <div class="scale-desc">Requires treatment before use</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Button -->
+        <button class="info-btn" onclick="showModal()" title="WQI Information">?</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
