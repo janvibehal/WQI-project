@@ -1,5 +1,4 @@
 # EcoDrop AI — Water Quality Prediction
-https://githubcard.com/janvibehal/WQI-project.git.svg
 
 EcoDrop AI is a water-quality assessment project that combines data analysis, machine learning experiments, and an interactive web interface. It allows users to enter water-quality parameters and view a calculated Water Quality Index (WQI), a corresponding quality grade, visualizations, and recommendations.
 
