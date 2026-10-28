@@ -1,6 +1,10 @@
+// Where the ML backend lives.
+//  - Frontend + backend served together (python app.py / one Render service): leave ''
+//  - Frontend on Vercel, backend on Render: put the Render URL, no trailing slash
+const API_BASE = 'https://ecodrop-ai.onrender.com';
+
 // Display metadata only (colours / wording per grade). The grade itself
 // comes from the RandomForest classifier on the server, never computed here.
-const API_BASE = 'https://ecodrop-ai.onrender.com';
 const GRADE_INFO = {
     A: { color: '#4CAF50', description: 'Excellent water quality - Super fit for consumption!', recommendation: 'This water meets all quality standards and is excellent for consumption.' },
     B: { color: '#2196F3', description: 'Good water quality - Fit for consumption!', recommendation: 'This water is safe for consumption with good quality parameters.' },
@@ -35,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function loadModelInfo() {
     try {
-        const res = await fetch('/api/model-info');
+        const res = await fetch(API_BASE + '/api/model-info');
         const info = await res.json();
         document.getElementById('totalSamples').textContent = info.samples;
         document.getElementById('modelAccuracy').textContent = info.r2_test + '%';
@@ -103,7 +107,7 @@ async function handleFormSubmit(event) {
     btn.disabled = true;
 
     try {
-        const res = await fetch('/api/predict', {
+        const res = await fetch(API_BASE + '/api/predict', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -113,7 +117,7 @@ async function handleFormSubmit(event) {
         displayResults(result);
     } catch (err) {
         alert(err instanceof TypeError
-            ? 'Cannot reach the ML server. Run "python app.py" and open http://localhost:5000'
+            ? 'Cannot reach the ML server. If it is hosted on Render, it may be waking up - wait ~1 minute and try again.'
             : err.message);
     } finally {
         btnText.style.display = 'inline';
