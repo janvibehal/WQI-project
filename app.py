@@ -60,6 +60,18 @@ def train():
 M = train()
 app = Flask(__name__)
 
+# CORS: lets the frontend hosted on Vercel call this API.
+# On Render set ALLOWED_ORIGIN=https://<your-app>.vercel.app  (default "*" = any site)
+ALLOWED_ORIGIN = os.environ.get("ALLOWED_ORIGIN", "*")
+
+
+@app.after_request
+def add_cors_headers(resp):
+    resp.headers["Access-Control-Allow-Origin"] = ALLOWED_ORIGIN
+    resp.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    resp.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    return resp
+
 
 # --------------------------------------------------------------------------
 # Routes
