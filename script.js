@@ -1,5 +1,6 @@
 // Display metadata only (colours / wording per grade). The grade itself
 // comes from the RandomForest classifier on the server, never computed here.
+const API_BASE = 'https://ecodrop-ai.onrender.com';
 const GRADE_INFO = {
     A: { color: '#4CAF50', description: 'Excellent water quality - Super fit for consumption!', recommendation: 'This water meets all quality standards and is excellent for consumption.' },
     B: { color: '#2196F3', description: 'Good water quality - Fit for consumption!', recommendation: 'This water is safe for consumption with good quality parameters.' },
